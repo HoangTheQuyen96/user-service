@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/HoangTheQuyen96/user-service/domain"
 	"gorm.io/gorm"
@@ -19,7 +18,11 @@ func NewUserRepository(db *gorm.DB) domain.UserRepository {
 }
 
 func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
-	fmt.Println("hihihehe")
-	fmt.Println(user)
-	return nil, nil
+	result := r.db.Create(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
 }
