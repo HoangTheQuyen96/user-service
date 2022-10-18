@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/HoangTheQuyen96/user-service/config"
 	"github.com/HoangTheQuyen96/user-service/database/provider/tidb"
 	"github.com/HoangTheQuyen96/user-service/domain"
 	"github.com/HoangTheQuyen96/user-service/user/entrypoints/http"
@@ -10,7 +11,9 @@ import (
 )
 
 func main() {
-	db := tidb.CreateDB()
+	cfg := config.Cfg
+
+	db := tidb.CreateDB(cfg.GetString("dbs.tidb.dsn"))
 
 	db.AutoMigrate(&domain.User{})
 
@@ -22,5 +25,5 @@ func main() {
 
 	http.NewUserHandler(router, uc)
 
-	router.Run(":8080")
+	router.Run(":" + cfg.GetString("server.port"))
 }

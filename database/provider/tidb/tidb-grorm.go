@@ -6,8 +6,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func CreateDB() *gorm.DB {
-	dsn := "2RwegwW5VvE7YQ3.root:quyen123@tcp(gateway01.us-west-2.prod.aws.tidbcloud.com:4000)/test?charset=utf8mb4"
+func CreateDB(dsn string) *gorm.DB {
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
