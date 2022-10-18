@@ -2,6 +2,8 @@ package domain
 
 import (
 	"context"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 type User struct {
@@ -21,10 +23,41 @@ type CreateUserRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
+type LoginRequest struct {
+	UserName string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type LoginResponse struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int32  `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+}
 type UserUsecase interface {
 	Register(context.Context, *CreateUserRequest) (*User, error)
+	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 }
 
 type UserRepository interface {
-	CreateUser(context.Context, *User) (*User, error)
+	CreateUser(ctx context.Context, user *User) (*User, error)
+	GetUserByPhoneOrEmail(ctx context.Context, emailOrPhone string) (*User, error)
+}
+type TokenDetails struct {
+	AccessToken  string
+	RefreshToken string
+	AccessUuid   string
+	RefreshUuid  string
+	AtExpires    int64
+	RtExpires    int64
+}
+
+type UserClaims struct {
+	Id          string `json:"id"`
+	Username    string `json:"username"`
+	AccessUuid  string `json:"access_uuid"`
+	RefreshUuid string `json:"refresh_uuid"`
+	Phone       string `json:"phone"`
+	Email       string `json:"email"`
+	jwt.StandardClaims
 }

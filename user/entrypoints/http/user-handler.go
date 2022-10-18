@@ -18,7 +18,18 @@ func NewUserHandler(router *gin.Engine, uc domain.UserUsecase) {
 		uc: uc,
 	}
 
-	router.POST("/users:register", handler.Register)
+	router.POST("/users:action", func(c *gin.Context) {
+		action := c.Param("action")
+
+		switch action {
+		case ":register":
+			handler.Register(c)
+		case ":login":
+			handler.Login(c)
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid action"})
+		}
+	})
 }
 
 func (h *userHandler) Register(c *gin.Context) {
@@ -46,4 +57,31 @@ func (h *userHandler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (h *userHandler) Login(c *gin.Context) {
+	var loginRequest domain.LoginRequest
+
+	if err := c.ShouldBindJSON(&loginRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	validate := validator.New()
+
+	err := validate.Struct(loginRequest)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	loginResponse, err := h.uc.Login(c, &loginRequest)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, loginResponse)
 }

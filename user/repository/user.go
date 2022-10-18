@@ -26,3 +26,16 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 
 	return user, nil
 }
+
+func (r *userRepository) GetUserByPhoneOrEmail(ctx context.Context, phoneOrEmail string) (*domain.User, error) {
+	var user domain.User
+
+	// find one user by phone or email
+	result := r.db.Where("phone = ? OR email = ?", phoneOrEmail, phoneOrEmail).First(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &user, nil
+}
