@@ -15,10 +15,10 @@ type User struct {
 }
 
 type CreateUserRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
+	Name     string `json:"name" validate:"required,email"`
+	Email    string `json:"email" validate:"required"`
+	Phone    string `json:"phone" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type UserUsecase interface {

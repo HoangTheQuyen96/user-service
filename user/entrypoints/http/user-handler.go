@@ -5,6 +5,7 @@ import (
 
 	"github.com/HoangTheQuyen96/user-service/domain"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator"
 )
 
 type userHandler struct {
@@ -24,6 +25,15 @@ func (h *userHandler) Register(c *gin.Context) {
 	var createUserRequest domain.CreateUserRequest
 
 	if err := c.ShouldBindJSON(&createUserRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	validate := validator.New()
+
+	err := validate.Struct(createUserRequest)
+
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
