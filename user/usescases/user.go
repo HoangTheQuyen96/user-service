@@ -6,6 +6,7 @@ import (
 
 	"github.com/HoangTheQuyen96/user-service/domain"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userUsecase struct {
@@ -19,12 +20,18 @@ func NewUserUsecase(userRepo domain.UserRepository) domain.UserUsecase {
 }
 
 func (u *userUsecase) Register(ctx context.Context, user *domain.CreateUserRequest) (*domain.User, error) {
+	pwdHash, err := u.hashPassword(user.Password)
+
+	if err != nil {
+		return nil, err
+	}
+
 	userCreated, err := u.userRepo.CreateUser(ctx, &domain.User{
 		Id:         uuid.New().String(),
 		Name:       user.Name,
 		Email:      user.Email,
 		Phone:      user.Phone,
-		Password:   user.Password,
+		Password:   pwdHash,
 		CreateTime: time.Now().Unix(),
 		UpdateTime: time.Now().Unix(),
 	})
@@ -34,4 +41,15 @@ func (u *userUsecase) Register(ctx context.Context, user *domain.CreateUserReque
 	}
 
 	return userCreated, nil
+}
+
+// hash password
+func (h *userUsecase) hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), 4)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(hash), nil
 }
