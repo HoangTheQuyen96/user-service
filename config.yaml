@@ -3,3 +3,5 @@ server:
 dbs:
   tidb:
     dsn: "2RwegwW5VvE7YQ3.root:quyen123@tcp(gateway01.us-west-2.prod.aws.tidbcloud.com:4000)/test?charset=utf8mb4"
+  redis: 
+    address: localhost:6379
